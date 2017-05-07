@@ -1,4 +1,4 @@
-package com.pranay.rxretroapicall.api;
+package com.pranay.rxretroapicall.api.rx;
 
 
 import io.reactivex.Observable;
@@ -12,16 +12,17 @@ import io.reactivex.schedulers.Schedulers;
  * Created by Pranay.
  */
 
-public class RxJava2APICallHelper {
-    public RxJava2APICallHelper() {
+public class RxAPICallHelper {
+    public RxAPICallHelper() {
     }
 
-    public static <T> Disposable call(Observable<T> observable, final RxJava2APICallback<T> rxJava2APICallback) {
+    public static <T> Disposable call(Observable<T> observable, final RxAPICallback<T> rxAPICallback) {
         if (observable == null) {
             throw new IllegalArgumentException("Observable must not be null.");
         }
 
-        if (rxJava2APICallback == null) {
+
+        if (rxAPICallback == null) {
             throw new IllegalArgumentException("Callback must not be null.");
         }
 
@@ -30,15 +31,15 @@ public class RxJava2APICallHelper {
                 .subscribe(new Consumer<T>() {
                     @Override
                     public void accept(@NonNull T t) throws Exception {
-                        rxJava2APICallback.onSuccess(t);
+                        rxAPICallback.onSuccess(t);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) throws Exception {
                         if (throwable != null) {
-                            rxJava2APICallback.onFailed(throwable);
+                            rxAPICallback.onFailed(throwable);
                         } else {
-                            rxJava2APICallback.onFailed(new Exception("Error: Something went wrong in api call."));
+                            rxAPICallback.onFailed(new Exception("Error: Something went wrong in api call."));
                         }
                     }
                 });
