@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class ApiProduction {
-    private static final String BASE_URL = "[YOUR_BASE_URL]";
+    private static final String BASE_URL = "https://api.stackexchange.com/2.2/";
     private Context context;
 
     private ApiProduction(Context context) {
