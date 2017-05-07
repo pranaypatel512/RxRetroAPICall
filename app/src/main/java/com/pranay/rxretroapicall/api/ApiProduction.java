@@ -8,6 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Pranay.
+ *
+ * API production class to get Retrofit Rest API adapter
  */
 
 public class ApiProduction {

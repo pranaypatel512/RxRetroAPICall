@@ -23,6 +23,7 @@ import com.pranay.rxretroapicall.api.service.StackOverFlowUserBadgesService;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     TextView tvGoldBadge;
     private Integer bronze_count = 0, silver_count = 0, gold_count = 0;
     private ProgressDialog mProgressDialog;
+    private Disposable disposable = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,24 +56,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * get User badge details
+     * Call API to get stackoverflow User badge details
      */
     private void getUserBadgeDetails() {
         mProgressDialog.show();
         StackOverFlowUserBadgesService badgesService = ApiProduction.getInstance(this).provideService(StackOverFlowUserBadgesService.class);
         Observable<StackOverFlowUserBadgesResponse> responseObservable = badgesService.getBadges("2949612");
-        RxAPICallHelper.call(responseObservable, new RxAPICallback<StackOverFlowUserBadgesResponse>() {
+        disposable = RxAPICallHelper.call(responseObservable, new RxAPICallback<StackOverFlowUserBadgesResponse>() {
             @Override
             public void onSuccess(StackOverFlowUserBadgesResponse badgesResponse) {
                 mProgressDialog.dismiss();
                 showToast(badgesResponse.getItems().size() > 0 ? "Success" : "Failed");
-                if(badgesResponse.getItems().size()>0) {
+                if (badgesResponse.getItems().size() > 0) {
                     calculateBadges(badgesResponse);
                 }
+                disposeCall();
             }
 
             @Override
             public void onFailed(Throwable throwable) {
+                disposeCall();
                 mProgressDialog.dismiss();
                 showToast(throwable.getLocalizedMessage());
             }
@@ -79,9 +83,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * After Called API, dispose call after success or failure.
+     */
+    private void disposeCall() {
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
+    }
+
+    /**
      * Calculate user badges as per aPI response
      *
-     * @param badgesResponse
+     * @param badgesResponse : use badge response
      */
     private void calculateBadges(StackOverFlowUserBadgesResponse badgesResponse) {
         for (StackOverFlowUserBadgesResponse.Item badge : badgesResponse.getItems()) {
@@ -99,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+        // Set Badge Counts in TextView
         tvBronzeBadge.setText(getStringFromHtmlText(getString(R.string.str_bronze_badge_text, String.valueOf(bronze_count))));
         tvSilverBadge.setText(getStringFromHtmlText(getString(R.string.str_silver_badge_text, String.valueOf(silver_count))));
         tvGoldBadge.setText(getStringFromHtmlText(getString(R.string.str_gold_badge_text, String.valueOf(gold_count))));

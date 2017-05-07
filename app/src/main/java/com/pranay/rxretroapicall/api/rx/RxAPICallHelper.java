@@ -10,8 +10,9 @@ import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Pranay.
+ *
+ * Common API Call Helper to make API call.
  */
-
 public class RxAPICallHelper {
     public RxAPICallHelper() {
     }
