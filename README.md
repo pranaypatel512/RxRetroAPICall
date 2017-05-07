@@ -7,6 +7,92 @@ API call example using Retrofit and RxJava2
 * Easy to use and understand.
 * Using Latest version of Retrofit and Rxjava2
 
+#### RxAPICallback.java
+```
+/**
+ * Common Callback to call API request response.
+ * @param <P> : response Type
+ */
+public interface RxAPICallback<P> {
+    void onSuccess(P t);
+
+    void onFailed(Throwable throwable);
+}
+```
+#### RxAPICallHelper.java
+```
+/**
+ *
+ * Common API Call Helper to make API call.
+ */
+public class RxAPICallHelper {
+    public RxAPICallHelper() {
+    }
+
+    public static <T> Disposable call(Observable<T> observable, final RxAPICallback<T> rxAPICallback) {
+        if (observable == null) {
+            throw new IllegalArgumentException("Observable must not be null.");
+        }
+
+
+        if (rxAPICallback == null) {
+            throw new IllegalArgumentException("Callback must not be null.");
+        }
+
+        return observable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<T>() {
+                    @Override
+                    public void accept(@NonNull T t) throws Exception {
+                        rxAPICallback.onSuccess(t);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(@NonNull Throwable throwable) throws Exception {
+                        if (throwable != null) {
+                            rxAPICallback.onFailed(throwable);
+                        } else {
+                            rxAPICallback.onFailed(new Exception("Error: Something went wrong in api call."));
+                        }
+                    }
+                });
+
+    }
+}
+```
+
+#### Example Call
+
+```
+/**
+     * Call API to get stackoverflow User badge details
+     */
+    private void getUserBadgeDetails() {
+        mProgressDialog.show();
+        StackOverFlowUserBadgesService badgesService = ApiProduction.getInstance(this).provideService(StackOverFlowUserBadgesService.class);
+        Observable<StackOverFlowUserBadgesResponse> responseObservable = badgesService.getBadges("2949612");
+        disposable = RxAPICallHelper.call(responseObservable, new RxAPICallback<StackOverFlowUserBadgesResponse>() {
+            @Override
+            public void onSuccess(StackOverFlowUserBadgesResponse badgesResponse) {
+                mProgressDialog.dismiss();
+                showToast(badgesResponse.getItems().size() > 0 ? "Success" : "Failed");
+                if (badgesResponse.getItems().size() > 0) {
+                    calculateBadges(badgesResponse);
+                }
+                disposeCall();
+            }
+
+            @Override
+            public void onFailed(Throwable throwable) {
+                disposeCall();
+                mProgressDialog.dismiss();
+                showToast(throwable.getLocalizedMessage());
+            }
+        });
+    }
+```
+
+
 ### Example Output
 
 <img src="https://github.com/pranaypatel512/RxRetroAPICall/blob/master/app/screenshot/RxJava_Retrofit_API_call_output.png" width="400">
