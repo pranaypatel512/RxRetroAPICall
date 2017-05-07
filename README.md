@@ -8,7 +8,7 @@ API call example using Retrofit and RxJava2
 * Using Latest version of Retrofit and Rxjava2
 
 #### RxAPICallback.java
-```
+```java
 /**
  * Common Callback to call API request response.
  * @param <P> : response Type
@@ -20,7 +20,7 @@ public interface RxAPICallback<P> {
 }
 ```
 #### RxAPICallHelper.java
-```
+```java
 /**
  *
  * Common API Call Helper to make API call.
@@ -63,7 +63,7 @@ public class RxAPICallHelper {
 
 #### Example Call
 
-```
+```java
 /**
      * Call API to get stackoverflow User badge details
      */
