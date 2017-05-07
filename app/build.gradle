@@ -40,4 +40,9 @@ dependencies {
     compile retrofitDependencies.okHttp
     compile retrofitDependencies.okHttpUrlConnection
     compile retrofitDependencies.okHttpLogginInterceptor
+
+    def rxJavaDependencies=rootProject.ext.rxJavaDependencies
+    compile rxJavaDependencies.rxjavaLib
+    compile rxJavaDependencies.rxandroidLib
+    compile rxJavaDependencies.rxjavaAdapterLib
 }
